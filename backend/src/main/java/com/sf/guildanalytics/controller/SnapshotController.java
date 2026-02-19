@@ -2,7 +2,6 @@ package com.sf.guildanalytics.controller;
 
 import com.sf.guildanalytics.dto.SnapshotDTO;
 import com.sf.guildanalytics.service.SnapshotService;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +23,6 @@ public class SnapshotController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEAD')")
     public SnapshotDTO createSnapshot(@RequestBody SnapshotDTO snapshotDTO) {
         return snapshotService.createSnapshot(snapshotDTO);
     }

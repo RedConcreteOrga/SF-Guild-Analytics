@@ -20,6 +20,9 @@ public class User {
     @Column(nullable = false)
     private String role; // ADMIN, GUILD_LEAD, MEMBER
 
+    @Column(name = "player_id")
+    private UUID playerId;
+
     // Getters and Setters
 
     public UUID getId() {
@@ -52,5 +55,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public UUID getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(UUID playerId) {
+        this.playerId = playerId;
     }
 }
