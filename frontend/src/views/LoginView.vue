@@ -44,6 +44,17 @@
           {{ error }}
         </p>
       </form>
+
+      <div class="mt-6 pt-6 border-t border-slate-800 text-center">
+        <p class="text-slate-500 text-sm mb-3">Kein Account? Gilden trotzdem ansehen:</p>
+        <button
+          @click="router.push({ name: 'guilds' })"
+          class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-2"
+        >
+          <Users class="w-4 h-4" />
+          Zur Gilden-Übersicht
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -52,7 +63,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { LayoutDashboard, Loader2 } from 'lucide-vue-next'
+import { LayoutDashboard, Loader2, Users } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -92,7 +92,7 @@ const handleSubmit = async () => {
     const response = await api.post('/guilds', form)
     // Update store state after success
     await authStore.checkOnboardingStatus()
-    router.push({ name: 'first-player' })
+    router.push({ name: 'guilds' })
   } catch (err) {
     error.value = err.response?.data?.message || 'Could not create guild. Please try again.'
     console.error('Create guild failed', err)

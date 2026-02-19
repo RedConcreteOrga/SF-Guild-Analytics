@@ -45,9 +45,11 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/guilds/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/players/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/snapshots/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/guilds", "/api/guilds/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/players", "/api/players/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/snapshots", "/api/snapshots/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers("/api/users/**").authenticated()
                         .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new org.springframework.web.cors.CorsConfiguration();

@@ -28,8 +28,8 @@
         </div>
       </div>
 
-      <button 
-        v-if="authStore.isAuthenticated"
+      <button
+        v-if="canEdit"
         @click="$router.push({ name: 'add-player', params: { guildId: $route.params.id } })"
         class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2"
       >
@@ -131,6 +131,13 @@ const authStore = useAuthStore()
 const players = ref([])
 const guild = ref(null)
 const loading = ref(true)
+
+const canEdit = computed(() =>
+  authStore.isAuthenticated && (
+    authStore.user?.role === 'ADMIN' ||
+    guild.value?.ownerId === authStore.user?.id
+  )
+)
 
 const averageLevel = computed(() => {
   if (players.value.length === 0) return 0

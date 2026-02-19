@@ -13,20 +13,36 @@
           <span class="text-lg font-bold text-white tracking-tight">SF Guild Analytics</span>
         </div>
 
-        <div v-if="!authStore.isReady && authStore.isAuthenticated" class="hidden md:flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-widest">
-          <span class="inline-block w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-          Initial Setup
-        </div>
-
         <div class="flex items-center gap-4">
+          <!-- Gilden-Link immer sichtbar -->
+          <button v-if="authStore.isAuthenticated"
+            @click="$router.push({ name: 'guilds' })"
+            class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-lg transition-all"
+            :class="isGuildsActive
+              ? 'text-white bg-indigo-600 shadow-lg shadow-indigo-600/20'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'"
+          >
+            <Users class="w-4 h-4" />
+            <span class="hidden sm:inline">Gilden</span>
+          </button>
+
           <template v-if="authStore.isAuthenticated">
-            <button 
-              v-if="authStore.user?.role === 'ADMIN'"
-              class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20"
-            >
-              <Shield class="w-4 h-4" />
-              <span class="hidden sm:inline">Admin</span>
-            </button>
+                <button
+                v-if="authStore.user?.role === 'ADMIN' || authStore.user?.role === 'GUILD_LEADER'"
+                @click="$router.push({ name: 'admin-bulk-update' })"
+                class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20"
+              >
+                <BarChart2 class="w-4 h-4" />
+                <span class="hidden sm:inline">Bulk Update</span>
+              </button>
+              <button
+                v-if="authStore.user?.role === 'ADMIN'"
+                @click="$router.push({ name: 'admin-users' })"
+                class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20"
+              >
+                <Shield class="w-4 h-4" />
+                <span class="hidden sm:inline">Benutzer</span>
+              </button>
             <button 
               v-if="authStore.user?.playerId"
               @click="$router.push({ name: 'player-detail', params: { id: authStore.user.playerId } })"
@@ -82,18 +98,41 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { LayoutDashboard, LogOut, Shield, LogIn, History } from 'lucide-vue-next'
+import { LayoutDashboard, LogOut, Shield, LogIn, History, BarChart2, Users } from 'lucide-vue-next'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
+
+const guilds = ref([])
+
+const isGuildsActive = computed(() =>
+  ['guilds', 'guild-players', 'player-detail', 'add-player'].includes(route.name)
+)
+
+const fetchGuilds = async () => {
+  try {
+    const response = await api.get('/guilds')
+    guilds.value = response.data
+  } catch (err) {
+    console.error('Error fetching guilds:', err)
+    error.value = true
+  } finally {
+    loading.value = false
+  }
+}
 
 const handleLogout = () => {
   authStore.logout()
   router.push({ name: 'login' })
 }
+
+onMounted(fetchGuilds)
 </script>
+
 
 <style scoped>
 .fade-enter-active,

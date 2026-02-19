@@ -11,18 +11,6 @@ const router = createRouter({
             meta: { requiresAuth: false },
         },
         {
-            path: '/onboarding',
-            component: () => import('@/layouts/AppLayout.vue'),
-            meta: { requiresAuth: true },
-            children: [
-                {
-                    path: 'guild',
-                    name: 'first-guild',
-                    component: () => import('@/views/Onboarding/FirstGuildView.vue'),
-                },
-            ],
-        },
-        {
             path: '/',
             component: () => import('@/layouts/AppLayout.vue'),
             meta: { requiresAuth: false },
@@ -44,6 +32,24 @@ const router = createRouter({
                     meta: { requiresAuth: true }
                 },
                 {
+                    path: 'guild/create',
+                    name: 'guild-create',
+                    component: () => import('@/views/CreateGuildView.vue'),
+                    meta: { requiresAuth: true }
+                },
+                {
+                    path: 'admin/bulk-update',
+                    name: 'admin-bulk-update',
+                    component: () => import('@/views/AdminBulkUpdateView.vue'),
+                    meta: { requiresAuth: true }
+                },
+                {
+                    path: 'admin/users',
+                    name: 'admin-users',
+                    component: () => import('@/views/AdminUsersView.vue'),
+                    meta: { requiresAuth: true }
+                },
+                {
                     path: 'player/:id',
                     name: 'player-detail',
                     component: () => import('@/views/PlayerDetailView.vue'),
@@ -53,37 +59,15 @@ const router = createRouter({
     ],
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
-    const isAuth = authStore.isAuthenticated;
 
-    if (to.meta.requiresAuth && !isAuth) {
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
         return next({ name: 'login' });
     }
 
-    if (to.name === 'login' && isAuth) {
+    if (to.name === 'login' && authStore.isAuthenticated) {
         return next({ name: 'guilds' });
-    }
-
-    if (isAuth) {
-        if (authStore.appState === 'READY' && !authStore.currentGuild) {
-            await authStore.checkOnboardingStatus();
-        }
-
-        const state = authStore.appState;
-
-        // Only force onboarding if it's an private route OR they are on the landing page
-        const isPublicBrowse = to.name === 'guilds' || to.name === 'guild-players' || to.name === 'player-detail';
-
-        if (!isPublicBrowse || (to.name === 'guilds' && state !== 'READY')) {
-            if (state === 'NO_GUILD' && to.name !== 'first-guild') {
-                return next({ name: 'first-guild' });
-            }
-        }
-
-        if (state === 'READY' && to.name === 'first-guild') {
-            return next({ name: 'guilds' });
-        }
     }
 
     next();

@@ -30,19 +30,19 @@ public class PlayerController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEAD')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEADER')")
     public PlayerDTO createPlayer(@RequestBody PlayerDTO playerDTO) {
         return playerService.createPlayer(playerDTO);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEAD')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEADER')")
     public PlayerDTO updatePlayer(@PathVariable UUID id, @RequestBody PlayerDTO playerDTO) {
         return playerService.updatePlayer(id, playerDTO);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEAD')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GUILD_LEADER')")
     public ResponseEntity<?> deletePlayer(@PathVariable UUID id) {
         playerService.deletePlayer(id);
         return ResponseEntity.ok().build();

@@ -27,6 +27,9 @@ public class Guild {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "owner_id")
+    private UUID ownerId;
+
     // Getters and Setters
 
     public UUID getId() {
@@ -75,5 +78,13 @@ public class Guild {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
     }
 }

@@ -152,30 +152,49 @@
 
       <!-- Snapshots History -->
       <div class="lg:col-span-2 space-y-6">
-        <!-- Level Trend Chart -->
+        <!-- Stat Trend Chart -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl shadow-slate-950/50">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="font-bold text-white">Level Progress</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-white">Statistik-Verlauf</h3>
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Historical Trend</span>
           </div>
-          
+
+          <!-- Stat Toggles -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button
+              v-for="stat in STAT_CONFIG"
+              :key="stat.key"
+              @click="toggleStat(stat.key)"
+              class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all"
+              :style="activeStats.includes(stat.key)
+                ? { backgroundColor: stat.color + '22', borderColor: stat.color, color: stat.color }
+                : { borderColor: '#334155', color: '#64748b' }"
+            >
+              {{ stat.label }}
+            </button>
+          </div>
+
           <div v-if="snapshots.length > 1" class="h-48 w-full">
             <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <!-- Y-axis lines -->
               <line v-for="i in 5" :key="i" x1="0" :y1="i*20" x2="100" :y2="i*20" stroke="#1e293b" stroke-width="0.5" />
-              <!-- Area -->
-              <path :d="chartAreaPath" fill="url(#gradient)" opacity="0.1" />
-              <!-- Line -->
-              <path :d="chartLinePath" fill="none" stroke="#6366f1" stroke-width="2" stroke-linejoin="round" />
-              <!-- Points -->
-              <circle v-for="pt in chartPoints" :key="pt.x" :cx="pt.x" :cy="pt.y" r="1" fill="#818cf8" />
-              
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0" />
-                </linearGradient>
-              </defs>
+              <template v-for="stat in STAT_CONFIG.filter(s => activeStats.includes(s.key))" :key="stat.key">
+                <path
+                  v-if="chartData[stat.key]"
+                  :d="getLinePath(chartData[stat.key])"
+                  fill="none"
+                  :stroke="stat.color"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                />
+                <circle
+                  v-for="pt in (chartData[stat.key] || [])"
+                  :key="pt.x + stat.key"
+                  :cx="pt.x"
+                  :cy="pt.y"
+                  r="1.2"
+                  :fill="stat.color"
+                />
+              </template>
             </svg>
             <div class="flex justify-between mt-2 text-[10px] text-slate-600 font-bold uppercase tracking-tighter">
               <span>{{ formatDate(snapshots[snapshots.length-1].timestamp) }}</span>
@@ -183,8 +202,8 @@
             </div>
           </div>
           <div v-else class="h-48 flex flex-col items-center justify-center text-slate-600 border border-dashed border-slate-800 rounded-xl">
-             <History class="w-8 h-8 mb-2 opacity-50" />
-             <p class="text-sm">More snapshots needed for trend</p>
+            <History class="w-8 h-8 mb-2 opacity-50" />
+            <p class="text-sm">Mehr Snapshots für Trend benötigt</p>
           </div>
         </div>
 
@@ -341,31 +360,50 @@ const handleUpdateStats = async () => {
   }
 }
 
-const chartPoints = computed(() => {
-  if (snapshots.value.length < 2) return []
-  
+const STAT_CONFIG = [
+  { key: 'level',           label: 'Level',      color: '#6366f1' },
+  { key: 'strength',        label: 'STR',        color: '#ef4444' },
+  { key: 'dexterity',       label: 'DEX',        color: '#22c55e' },
+  { key: 'intelligence',    label: 'INT',        color: '#3b82f6' },
+  { key: 'constitution',    label: 'CON',        color: '#eab308' },
+  { key: 'hp',              label: 'HP',         color: '#ec4899' },
+  { key: 'honor',           label: 'Honor',      color: '#f97316' },
+  { key: 'dungeonProgress', label: 'Dungeon %',  color: '#14b8a6' },
+  { key: 'fortressLevel',   label: 'Festung',    color: '#a855f7' },
+]
+
+const activeStats = ref(['level'])
+
+const toggleStat = (key) => {
+  const idx = activeStats.value.indexOf(key)
+  if (idx === -1) {
+    activeStats.value.push(key)
+  } else if (activeStats.value.length > 1) {
+    activeStats.value.splice(idx, 1)
+  }
+}
+
+const chartData = computed(() => {
+  if (snapshots.value.length < 2) return {}
   const sorted = [...snapshots.value].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-  const levels = sorted.map(s => s.level)
-  const minLvl = Math.min(...levels)
-  const maxLvl = Math.max(...levels)
-  const range = maxLvl - minLvl || 1
-  
-  return sorted.map((s, i) => ({
-    x: (i / (sorted.length - 1)) * 100,
-    y: 100 - ((s.level - minLvl) / range) * 80 - 10 // scale to 10-90
-  }))
+  const result = {}
+  for (const stat of activeStats.value) {
+    const values = sorted.map(s => Number(s[stat]) || 0)
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const range = max - min || 1
+    result[stat] = sorted.map((s, i) => ({
+      x: (i / (sorted.length - 1)) * 100,
+      y: 100 - ((Number(s[stat] || 0) - min) / range) * 80 - 10
+    }))
+  }
+  return result
 })
 
-const chartLinePath = computed(() => {
-  if (chartPoints.value.length < 2) return ''
-  return 'M ' + chartPoints.value.map(p => `${p.x},${p.y}`).join(' L ')
-})
-
-const chartAreaPath = computed(() => {
-  if (chartPoints.value.length < 2) return ''
-  const line = chartLinePath.value
-  return `${line} L 100,100 L 0,100 Z`
-})
+const getLinePath = (points) => {
+  if (!points || points.length < 2) return ''
+  return 'M ' + points.map(p => `${p.x},${p.y}`).join(' L ')
+}
 
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A'

@@ -22,6 +22,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sf_guild_analytics
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
       - db
 
@@ -38,3 +40,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:

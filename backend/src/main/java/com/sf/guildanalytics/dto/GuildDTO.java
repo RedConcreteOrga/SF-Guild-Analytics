@@ -13,6 +13,7 @@ public class GuildDTO {
     private int playerCount;
     private double avgLevel;
     private String imageUrl;
+    private UUID ownerId;
 
     // Getters and Setters
     public UUID getId() {
@@ -77,5 +78,13 @@ public class GuildDTO {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
     }
 }
