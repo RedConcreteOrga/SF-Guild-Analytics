@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: sf_guild_analytics_db
+    environment:
+      POSTGRES_DB: sf_guild_analytics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: belos
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
