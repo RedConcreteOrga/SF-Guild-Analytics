@@ -1,72 +1,87 @@
-# SF-Guild-Analytics
-SF Guild Analytics ist ein selbst gehostetes, Open-Source-Web-Tool für Gildenleiter. Spieler-Stats werden regelmäßig erfasst (manuell oder semi-automatisch), über Zeit gespeichert und grafisch ausgewertet, inklusive Fortschritt, Prozent-Verbesserungen und Vergleich innerhalb der Gilde.
-✅ 1️⃣ Feature-Liste (Roadmap-fähig)
-👤 Spieler & Gilden
+SF Guild Analytics
+
+SF Guild Analytics ist ein selbst gehostetes, Open-Source-Webtool für Gildenleiter in Shakes & Fidget.
+Es ermöglicht das strukturierte Erfassen von Spieler-Stats, speichert diese über Zeit und visualisiert Fortschritt, Trends und prozentuale Verbesserungen in übersichtlichen Dashboards.
+
+Fokus: Progress sichtbar machen, nicht nur Zahlen auflisten.
+
+🚀 Motivation
+
+Aktuelle SF-Community-Tools zeigen überwiegend statische Tabellen (Momentaufnahmen).
+Was fehlt, ist ein Tool, das beantwortet:
+
+Wie stark hat sich ein Spieler verbessert?
+
+Wer macht konstant Fortschritt – und wer stagniert?
+
+Wie entwickelt sich die Gilde insgesamt über Wochen/Monate?
+
+Wer trägt wirklich zum Wachstum bei?
+
+SF Guild Analytics schließt genau diese Lücke.
+
+✨ Features
+👥 Gilden & Spieler
 
 Gilden anlegen (Name, Server, Fraktion)
 
 Spieler anlegen (Name, Klasse, Level, Eintrittsdatum)
 
-Rollen: Admin / Gildenlead / Member
+Rollen & Rechte:
 
-Mehrere Gilden pro Instanz möglich
+Admin
+
+Gilden-Lead
+
+Member (Read-only)
 
 📥 Datenerfassung
 
-Manuelle Eingabe von Stats (Formular)
+Manuelle Eingabe von Spieler-Stats
 
 Zeitbasierte Snapshots (z. B. täglich / wöchentlich)
 
-Optional: CSV-Import
+CSV-Import (optional)
 
-Historisierung aller Werte (kein Überschreiben!)
+Historisierung aller Daten (keine Überschreibung)
 
 📊 Grafische Auswertungen (Kernfeature)
 
-Zeitverlauf-Charts pro Spieler
+Zeitverlauf-Diagramme pro Spieler
 
-Prozentuale Verbesserung (z. B. „+18 % Stärke in 14 Tagen“)
+Prozentuale Verbesserung (z. B. +15 % Stärke in 14 Tagen)
 
-Vergleich Spieler ↔ Gilde
+Vergleich Spieler ↔ Spieler
 
-Ranglisten (Top-Fortschritt, Aktivität, Wachstum)
+Vergleich Spieler ↔ Gilden-Durchschnitt
+
+Ranglisten nach Wachstum & Aktivität
 
 🧠 Analyse & KPIs
 
-Aktivitäts-Score (wer liefert Progress?)
+Fortschritts-Score pro Spieler
 
-Wachstumsgeschwindigkeit
+Aktivitäts-Score
 
 Durchschnittswerte der Gilde
 
-Warnungen bei Stagnation (optional)
+Trend-Indikatoren (steigend / stagnierend / fallend)
 
-🌐 Web & Sharing
+Optional: Warnungen bei fehlendem Fortschritt
 
-Web-Dashboard
+🌐 Web & Zugriff
 
-Öffentliche / private Ansichten
+Web-Dashboard (Desktop & Mobile)
+
+Private & öffentliche Ansichten
 
 Read-only Links für Mitglieder
 
-Mobile-freundlich
+Keine externe Cloud notwendig
 
-⚙️ Self-Hosting & Open Source
+🧩 Beispiel-Daten (Snapshot)
 
-Docker-Setup
-
-Keine externe Abhängigkeit
-
-Volle Datenkontrolle
-
-🧠 2️⃣ Konzept-Entwurf (Was tut das Tool?)
-🔁 Datenfluss
-Spieler trägt Stats ein
-→ Snapshot wird gespeichert
-→ Tool berechnet Differenzen
-→ Graphen + KPIs werden aktualisiert
-
-🗂 Beispiel-Spieler-Snapshot
+Ein Snapshot speichert u. a.:
 
 Datum
 
@@ -86,114 +101,119 @@ Festung (Level, Arbeiter)
 
 Gold / Pilze (optional)
 
-Aktivitätsmarker (Login, Beitrag)
+Aktivitätsmarker
 
-📈 Berechnungen
+Alle Snapshots werden versioniert gespeichert und dienen als Basis für Analysen.
 
-Absolute Differenz (Δ)
+🏗 Architektur (High Level)
+Browser (Frontend)
+   ↓
+REST API
+   ↓
+Backend (Business Logic)
+   ↓
+PostgreSQL (Snapshots & Historie)
 
-Prozentuale Veränderung
-
-Durchschnitt / Median
-
-Trend (↑ ↓ →)
-
-🖼 3️⃣ Beispiel-Screens & Diagramm-Templates
-📊 Spieler-Dashboard
-4
-
-Enthält:
-
-Level-Kurve
-
-Attribut-Wachstum
-
-KPI-Cards:
-
-+% Gesamtstärke
-
-Aktivität
-
-Platz in der Gilde
-
-🏰 Gilden-Übersicht
-4
-
-Enthält:
-
-Gilden-Durchschnitt
-
-Ranking nach Wachstum
-
-Aktivitäts-Heatmap
-
-Fortschritt gesamt
-
-🔍 Vergleich Spieler ↔ Spieler
-
-Enthält:
-
-Radar-Charts
-
-Balken-Vergleiche
-
-Trend-Indikatoren
-
-🧰 4️⃣ Tech-Stack-Vorschlag (bewährt & simpel)
-🖥 Frontend
+🧰 Tech-Stack
+Frontend
 
 React + Vite
 
-Chart.js oder ECharts
+Chart.js oder Apache ECharts
 
 TailwindCSS
 
-Mobile-first
+Mobile-first Design
 
-🔙 Backend
+Backend
 
 Node.js (NestJS) oder Python (FastAPI)
 
-REST-API
+REST API
 
-Auth via JWT
+JWT-basierte Authentifizierung
 
-🗄 Datenbank
+Datenbank
 
 PostgreSQL
 
-Zeitreihen-fähig
+Zeitreihen-freundliches Schema
 
-Saubere Relationsstruktur
-
-🐳 Deployment
+Deployment
 
 Docker & Docker Compose
 
-.env-Konfiguration
+.env-basierte Konfiguration
 
-Reverse Proxy optional (Traefik / Nginx)
+Reverse Proxy optional (Nginx / Traefik)
 
-🔓 Lizenz
-
-MIT oder AGPL (Community-freundlich)
-
-📦 Ordnerstruktur (GitHub-ready)
+📦 Projektstruktur
 sf-guild-analytics/
 ├─ backend/
 ├─ frontend/
 ├─ docker/
 ├─ docs/
-│  ├─ screenshots/
 │  ├─ api.md
-│  └─ roadmap.md
-├─ README.md
-└─ docker-compose.yml
+│  ├─ roadmap.md
+│  └─ screenshots/
+├─ docker-compose.yml
+└─ README.md
 
-🎯 Warum das ein starkes Community-Projekt wäre
+🔒 Datenschutz & Fair Use
 
-✔️ Gibt es aktuell nicht
-✔️ Hoher Mehrwert für Gilden-Leads
-✔️ Self-Hosted → kein Drama mit SF-Regeln
-✔️ Erweiterbar (Discord-Bot, Exports, etc.)
-✔️ Perfekt für Open Source
+Keine automatisierte Datenerfassung aus dem Spiel
+
+Keine Verbindung zu offiziellen SF-Servern
+
+Alle Daten werden manuell oder freiwillig eingegeben
+
+Vollständig self-hosted → volle Datenkontrolle
+
+🛠 Installation (Kurzfassung)
+git clone https://github.com/<org>/sf-guild-analytics.git
+cd sf-guild-analytics
+cp .env.example .env
+docker compose up -d
+
+
+Danach ist das Dashboard unter http://localhost erreichbar.
+
+🛣 Roadmap (Auszug)
+
+ Basis-Dashboard
+
+ Spieler-Zeitverlauf-Charts
+
+ Prozent- & Trend-Berechnung
+
+ CSV-Import
+
+ Rollen & Rechte
+
+ Export (PNG / CSV)
+
+ Discord-Integration (optional)
+
+🤝 Contributing
+
+Contributions sind ausdrücklich willkommen:
+
+Feature-Vorschläge
+
+Bug-Reports
+
+UI-Verbesserungen
+
+Dokumentation
+
+Bitte nutze Issues & Pull Requests.
+
+📄 Lizenz
+
+Dieses Projekt ist Open Source.
+Lizenz: MIT (oder AGPL – je nach Community-Entscheid)
+
+❤️ Community
+
+Dieses Projekt ist von der SF-Community für die SF-Community gedacht.
+Feedback, Ideen und Diskussionen sind ausdrücklich erwünscht.
