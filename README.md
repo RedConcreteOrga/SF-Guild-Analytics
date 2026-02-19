@@ -1,219 +1,258 @@
-SF Guild Analytics
+# SF Guild Analytics
 
 SF Guild Analytics ist ein selbst gehostetes, Open-Source-Webtool für Gildenleiter in Shakes & Fidget.
 Es ermöglicht das strukturierte Erfassen von Spieler-Stats, speichert diese über Zeit und visualisiert Fortschritt, Trends und prozentuale Verbesserungen in übersichtlichen Dashboards.
 
-Fokus: Progress sichtbar machen, nicht nur Zahlen auflisten.
+**Fokus: Progress sichtbar machen, nicht nur Zahlen auflisten.**
 
-🚀 Motivation
+---
 
-Aktuelle SF-Community-Tools zeigen überwiegend statische Tabellen (Momentaufnahmen).
-Was fehlt, ist ein Tool, das beantwortet:
+## Motivation
 
-Wie stark hat sich ein Spieler verbessert?
+Aktuelle SF-Community-Tools zeigen überwiegend statische Tabellen (Momentaufnahmen). Was fehlt, ist ein Tool, das beantwortet:
 
-Wer macht konstant Fortschritt – und wer stagniert?
-
-Wie entwickelt sich die Gilde insgesamt über Wochen/Monate?
-
-Wer trägt wirklich zum Wachstum bei?
+- Wie stark hat sich ein Spieler verbessert?
+- Wer macht konstant Fortschritt – und wer stagniert?
+- Wie entwickelt sich die Gilde insgesamt über Wochen/Monate?
+- Wer trägt wirklich zum Wachstum bei?
 
 SF Guild Analytics schließt genau diese Lücke.
 
-✨ Features
-👥 Gilden & Spieler
+---
 
-Gilden anlegen (Name, Server, Fraktion)
+## Features
 
-Spieler anlegen (Name, Klasse, Level, Eintrittsdatum)
+### Gilden & Spieler
+- Gilden anlegen (Name, Server, Fraktion)
+- Spieler anlegen (Name, Klasse, Level, Eintrittsdatum)
+- Rollen & Rechte: Admin, Gilden-Lead, Member (Read-only)
 
-Rollen & Rechte:
+### Datenerfassung
+- Manuelle Eingabe von Spieler-Stats
+- Zeitbasierte Snapshots (z. B. täglich / wöchentlich)
+- CSV-Import (optional)
+- Historisierung aller Daten (keine Überschreibung)
 
-Admin
+### Grafische Auswertungen
+- Zeitverlauf-Diagramme pro Spieler
+- Prozentuale Verbesserung (z. B. +15 % Stärke in 14 Tagen)
+- Vergleich Spieler ↔ Spieler
+- Vergleich Spieler ↔ Gilden-Durchschnitt
+- Ranglisten nach Wachstum & Aktivität
 
-Gilden-Lead
+### Analyse & KPIs
+- Fortschritts-Score pro Spieler
+- Aktivitäts-Score
+- Durchschnittswerte der Gilde
+- Trend-Indikatoren (steigend / stagnierend / fallend)
+- Optional: Warnungen bei fehlendem Fortschritt
 
-Member (Read-only)
+### Web & Zugriff
+- Web-Dashboard (Desktop & Mobile)
+- Private & öffentliche Ansichten
+- Read-only Links für Mitglieder
+- Keine externe Cloud notwendig
 
-📥 Datenerfassung
+---
 
-Manuelle Eingabe von Spieler-Stats
-
-Zeitbasierte Snapshots (z. B. täglich / wöchentlich)
-
-CSV-Import (optional)
-
-Historisierung aller Daten (keine Überschreibung)
-
-📊 Grafische Auswertungen (Kernfeature)
-
-Zeitverlauf-Diagramme pro Spieler
-
-Prozentuale Verbesserung (z. B. +15 % Stärke in 14 Tagen)
-
-Vergleich Spieler ↔ Spieler
-
-Vergleich Spieler ↔ Gilden-Durchschnitt
-
-Ranglisten nach Wachstum & Aktivität
-
-🧠 Analyse & KPIs
-
-Fortschritts-Score pro Spieler
-
-Aktivitäts-Score
-
-Durchschnittswerte der Gilde
-
-Trend-Indikatoren (steigend / stagnierend / fallend)
-
-Optional: Warnungen bei fehlendem Fortschritt
-
-🌐 Web & Zugriff
-
-Web-Dashboard (Desktop & Mobile)
-
-Private & öffentliche Ansichten
-
-Read-only Links für Mitglieder
-
-Keine externe Cloud notwendig
-
-🧩 Beispiel-Daten (Snapshot)
+## Beispiel-Daten (Snapshot)
 
 Ein Snapshot speichert u. a.:
 
-Datum
+| Feld | Beschreibung |
+|------|--------------|
+| Datum | Zeitpunkt der Erfassung |
+| Level | Spielerlevel |
+| Stärke / Geschick / Intelligenz | Primärattribute |
+| Ausdauer | Ausdauerwert |
+| Lebenspunkte | HP |
+| Ehrenhalle | Rang / Punkte |
+| Dungeon-Fortschritt | Prozentualer Fortschritt |
+| Festung | Level & Arbeiter |
+| Gold / Pilze | Optional |
+| Aktivitätsmarker | Letzter Login / Aktivität |
 
-Level
+Alle Snapshots werden versioniert gespeichert und dienen als Basis für alle Analysen.
 
-Stärke / Geschick / Intelligenz
+---
 
-Ausdauer
+## Architektur
 
-Lebenspunkte
+```
+Browser (Vue 3 Frontend)
+        ↓
+   REST API (:41414)
+        ↓
+Backend (Spring Boot)
+        ↓
+ PostgreSQL (:5433)
+```
 
-Ehrenhalle
+---
 
-Dungeon-Fortschritt (%)
+## Tech-Stack
 
-Festung (Level, Arbeiter)
+| Schicht | Technologie |
+|---------|-------------|
+| Frontend | Vue 3, Vite, TailwindCSS, Pinia, Vue Router |
+| Backend | Java 17, Spring Boot 3, Spring Security, JPA/Hibernate |
+| Authentifizierung | JWT (JJWT) |
+| Datenbank | PostgreSQL 15 |
+| Deployment | Docker & Docker Compose |
 
-Gold / Pilze (optional)
+---
 
-Aktivitätsmarker
+## Projektstruktur
 
-Alle Snapshots werden versioniert gespeichert und dienen als Basis für Analysen.
-
-🏗 Architektur (High Level)
-Browser (Frontend)
-   ↓
-REST API
-   ↓
-Backend (Business Logic)
-   ↓
-PostgreSQL (Snapshots & Historie)
-
-🧰 Tech-Stack
-Frontend
-
-React + Vite
-
-Chart.js oder Apache ECharts
-
-TailwindCSS
-
-Mobile-first Design
-
-Backend
-
-Node.js (NestJS) oder Python (FastAPI)
-
-REST API
-
-JWT-basierte Authentifizierung
-
-Datenbank
-
-PostgreSQL
-
-Zeitreihen-freundliches Schema
-
-Deployment
-
-Docker & Docker Compose
-
-.env-basierte Konfiguration
-
-Reverse Proxy optional (Nginx / Traefik)
-
-📦 Projektstruktur
+```
 sf-guild-analytics/
-├─ backend/
-├─ frontend/
-├─ docker/
-├─ docs/
-│  ├─ api.md
-│  ├─ roadmap.md
-│  └─ screenshots/
-├─ docker-compose.yml
-└─ README.md
+├── backend/          # Spring Boot Anwendung
+├── frontend/         # Vue 3 + Vite Anwendung
+├── docker-compose.yml
+└── README.md
+```
 
-🔒 Datenschutz & Fair Use
+---
 
-Keine automatisierte Datenerfassung aus dem Spiel
+## Installation & Start
 
-Keine Verbindung zu offiziellen SF-Servern
+### Voraussetzungen
 
-Alle Daten werden manuell oder freiwillig eingegeben
+- [Docker & Docker Compose](https://docs.docker.com/get-docker/) (für alle Varianten)
+- [Java 17](https://adoptium.net/) + [Maven](https://maven.apache.org/) (nur für lokale Backend-Entwicklung)
+- [Node.js 18+](https://nodejs.org/) + npm (nur für lokale Frontend-Entwicklung)
 
-Vollständig self-hosted → volle Datenkontrolle
+---
 
-🛠 Installation (Kurzfassung)
-git clone https://github.com/<org>/sf-guild-analytics.git
+### Option A – Alles per Docker Compose starten (empfohlen)
+
+```bash
+git clone https://github.com/RedConcrete/sf-guild-analytics.git
 cd sf-guild-analytics
-cp .env.example .env
 docker compose up -d
+```
 
+Danach sind die Dienste unter folgenden Adressen erreichbar:
 
-Danach ist das Dashboard unter http://localhost erreichbar.
+| Dienst | URL |
+|--------|-----|
+| Frontend (Vue 3) | http://localhost:5173 |
+| Backend API | http://localhost:41414 |
+| PostgreSQL | localhost:5433 |
 
-🛣 Roadmap (Auszug)
+Logs aller Dienste ansehen:
+```bash
+docker compose logs -f
+```
 
- Basis-Dashboard
+Dienste stoppen:
+```bash
+docker compose down
+```
 
- Spieler-Zeitverlauf-Charts
+---
 
- Prozent- & Trend-Berechnung
+### Option B – Lokale Entwicklung
 
- CSV-Import
+Diese Variante eignet sich, wenn du am Backend oder Frontend entwickeln möchtest.
 
- Rollen & Rechte
+**1. Datenbank starten (Docker)**
 
- Export (PNG / CSV)
+```bash
+docker compose up -d db
+```
 
- Discord-Integration (optional)
+Die PostgreSQL-Instanz ist danach unter `localhost:5433` erreichbar.
 
-🤝 Contributing
+**2. Backend starten**
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+Das Backend startet unter: `http://localhost:41414`
+
+> **Hinweis:** Beim ersten Start legt Hibernate die Tabellen automatisch an (`ddl-auto: update`).
+> Ein Admin-User muss manuell in die `users`-Tabelle eingetragen werden (BCrypt-Hash für das Passwort).
+
+**3. Frontend starten**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Das Frontend startet unter: `http://localhost:5173`
+
+---
+
+### Datenbank zurücksetzen
+
+```bash
+docker compose down -v   # Löscht auch das Daten-Volume
+docker compose up -d db
+```
+
+---
+
+## API-Endpunkte (Auszug)
+
+| Methode | Endpunkt | Beschreibung |
+|---------|----------|--------------|
+| POST | `/api/auth/login` | Login, gibt JWT zurück |
+
+Beispiel-Login:
+```bash
+curl -X POST http://localhost:41414/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "yourpassword"}'
+```
+
+---
+
+## Datenschutz & Fair Use
+
+- Keine automatisierte Datenerfassung aus dem Spiel
+- Keine Verbindung zu offiziellen SF-Servern
+- Alle Daten werden manuell oder freiwillig eingegeben
+- Vollständig self-hosted – volle Datenkontrolle beim Betreiber
+
+---
+
+## Roadmap (Auszug)
+
+- [ ] Basis-Dashboard
+- [ ] Spieler-Zeitverlauf-Charts
+- [ ] Prozent- & Trend-Berechnung
+- [ ] CSV-Import
+- [ ] Rollen & Rechte
+- [ ] Export (PNG / CSV)
+- [ ] Discord-Integration (optional)
+
+---
+
+## Contributing
 
 Contributions sind ausdrücklich willkommen:
 
-Feature-Vorschläge
+- Feature-Vorschläge
+- Bug-Reports
+- UI-Verbesserungen
+- Dokumentation
 
-Bug-Reports
+Bitte nutze [Issues](https://github.com/RedConcrete/sf-guild-analytics/issues) & Pull Requests.
 
-UI-Verbesserungen
+---
 
-Dokumentation
+## Lizenz
 
-Bitte nutze Issues & Pull Requests.
+Dieses Projekt steht unter der **MIT-Lizenz** – siehe [LICENSE](LICENSE).
 
-📄 Lizenz
+---
 
-Dieses Projekt ist Open Source.
-Lizenz: MIT (oder AGPL – je nach Community-Entscheid)
-
-❤️ Community
+## Community
 
 Dieses Projekt ist von der SF-Community für die SF-Community gedacht.
 Feedback, Ideen und Diskussionen sind ausdrücklich erwünscht.
