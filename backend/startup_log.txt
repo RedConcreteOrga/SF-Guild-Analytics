@@ -1,0 +1,58 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-----------------------< [0;36mcom.sf:guild-analytics[0;1m >-----------------------[m
+[[1;34mINFO[m] [1mBuilding sf-guild-analytics 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:3.2.2:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mguild-analytics[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mguild-analytics[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 0 resource from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.11.0:compile[m [1m(default-compile)[m @ [36mguild-analytics[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:testResources[m [1m(default-testResources)[m @ [36mguild-analytics[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /mnt/c/Users/franz.klose/OneDrive - BE O365 MS-Cloud/Dokumente/SF-Guild-Analytics/backend/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.11.0:testCompile[m [1m(default-testCompile)[m @ [36mguild-analytics[0;1m ---[m
+[[1;34mINFO[m] No sources to compile
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:3.2.2:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mguild-analytics[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:3.2.2:run[m [1m(default-cli)[m @ [36mguild-analytics[0;1m ---[m
+[[1;34mINFO[m] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.2)
+
+2026-02-19T14:45:17.220+01:00  INFO 795984 --- [sf-guild-analytics] [           main] c.s.g.SfGuildAnalyticsApplication        : Starting SfGuildAnalyticsApplication using Java 21.0.10 with PID 795984 (/mnt/c/Users/franz.klose/OneDrive - BE O365 MS-Cloud/Dokumente/SF-Guild-Analytics/backend/target/classes started by franzklose in /mnt/c/Users/franz.klose/OneDrive - BE O365 MS-Cloud/Dokumente/SF-Guild-Analytics/backend)
+2026-02-19T14:45:17.223+01:00  INFO 795984 --- [sf-guild-analytics] [           main] c.s.g.SfGuildAnalyticsApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-02-19T14:45:20.971+01:00  INFO 795984 --- [sf-guild-analytics] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-19T14:45:21.848+01:00  INFO 795984 --- [sf-guild-analytics] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 824 ms. Found 4 JPA repository interfaces.
+2026-02-19T14:45:24.534+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 9090 (http)
+2026-02-19T14:45:24.591+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-19T14:45:24.592+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.18]
+2026-02-19T14:45:24.797+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-19T14:45:24.798+01:00  INFO 795984 --- [sf-guild-analytics] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 7486 ms
+2026-02-19T14:45:25.633+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-19T14:45:26.344+01:00  INFO 795984 --- [sf-guild-analytics] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.1.Final
+2026-02-19T14:45:26.762+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-19T14:45:28.889+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-19T14:45:29.114+01:00  INFO 795984 --- [sf-guild-analytics] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-19T14:45:29.813+01:00  INFO 795984 --- [sf-guild-analytics] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@19105a87
+2026-02-19T14:45:29.824+01:00  INFO 795984 --- [sf-guild-analytics] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-19T14:45:30.035+01:00  WARN 795984 --- [sf-guild-analytics] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-19T14:45:37.043+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-19T14:45:37.337+01:00  INFO 795984 --- [sf-guild-analytics] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-19T14:45:39.462+01:00  WARN 795984 --- [sf-guild-analytics] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-19T14:45:40.842+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@61d9dd15, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@4936fbc6, org.springframework.security.web.context.SecurityContextHolderFilter@7da9b32c, org.springframework.security.web.header.HeaderWriterFilter@748fa354, org.springframework.web.filter.CorsFilter@b4c89b6, org.springframework.security.web.authentication.logout.LogoutFilter@16257f8c, com.sf.guildanalytics.security.JwtAuthenticationFilter@5a010eec, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@46df794e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5cd6a827, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@54f62ac6, org.springframework.security.web.session.SessionManagementFilter@2003edf, org.springframework.security.web.access.ExceptionTranslationFilter@55a07f97, org.springframework.security.web.access.intercept.AuthorizationFilter@4560eb15]
+2026-02-19T14:45:41.673+01:00  INFO 795984 --- [sf-guild-analytics] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 9090 (http) with context path ''
+2026-02-19T14:45:41.686+01:00  INFO 795984 --- [sf-guild-analytics] [           main] c.s.g.SfGuildAnalyticsApplication        : Started SfGuildAnalyticsApplication in 26.56 seconds (process running for 28.033)

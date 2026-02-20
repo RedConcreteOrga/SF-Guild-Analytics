@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: sf_guild_analytics_db
+    environment:
+      POSTGRES_DB: sf_guild_analytics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: sf_guild_analytics_backend
+    ports:
+      - "41414:41414"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sf_guild_analytics
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: sf_guild_analytics_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  uploads_data:
