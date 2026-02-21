@@ -102,8 +102,8 @@ public class SecurityConfig {
                 var config = new org.springframework.web.cors.CorsConfiguration();
                 config.setAllowedOriginPatterns(java.util.List.of(
                     "http://localhost:*",
-                    "http://127.0.0.1:*"
-                    // Production: "https://yourdomain.com"
+                    "http://127.0.0.1:*",
+                    "https://sf.r3dconcrete.de"
                 ));
                 config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "X-Requested-With"));
