@@ -16,7 +16,7 @@ docker run --rm \
   -v "$SCRIPT_DIR/backend/pom.xml:/home/app/pom.xml" \
   -v "$SCRIPT_DIR/backend/target:/home/app/target" \
   maven:3.9.6-eclipse-temurin-17 \
-  mvn -f /home/app/pom.xml clean package -DskipTests
+  sh -c "rm -rf /home/app/target/* && mvn -f /home/app/pom.xml package -DskipTests"
 
 echo "=== 2/4 Frontend dist bauen ==="
 docker run --rm \
