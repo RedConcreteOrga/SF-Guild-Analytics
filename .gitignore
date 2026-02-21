@@ -1,0 +1,27 @@
+# SECURITY: Niemals committen
+.env
+*.env.local
+
+# Let's Encrypt Zertifikate
+certbot/
+
+# Logs
+logs/
+*.log
+
+# Docker-Volumes (lokale Daten)
+postgres_data/
+uploads_data/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build-Outputs
+frontend/dist/
+backend/target/
