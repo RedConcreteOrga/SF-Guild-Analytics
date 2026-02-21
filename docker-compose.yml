@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -15,6 +13,7 @@ services:
 
   backend:
     build: ./backend
+    image: sf-guild-analytics-backend
     container_name: sf_guild_analytics_backend
     ports:
       - "41414:41414"
@@ -22,19 +21,22 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sf_guild_analytics
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_PROFILES_ACTIVE=dev
     volumes:
       - uploads_data:/app/uploads
     depends_on:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # Im Dev-Setup gibt es keinen nginx-Proxy → direkt auf den Backend-Port
+        VITE_API_BASE_URL: http://localhost:41414/api
+    image: sf-guild-analytics-frontend
     container_name: sf_guild_analytics_frontend
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "5173:80"  # nginx im Container lauscht auf 80, außen auf 5173 erreichbar
     depends_on:
       - backend
 

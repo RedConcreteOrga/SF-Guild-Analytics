@@ -1,13 +1,15 @@
 #!/bin/bash
 
 # ─── Verwendung ───────────────────────────────────────────────────────────────
-# ./restart.sh          → Entwicklung (Standard)
-# ./restart.sh dev      → Entwicklung
-# ./restart.sh prod     → Produktion
+# ./build.sh               → Entwicklung (Standard)
+# ./build.sh dev           → Entwicklung (nur Backend neu bauen)
+# ./build.sh prod          → Produktion (Frontend + Backend neu bauen)
+# ./build.sh prod --clean  → Produktion ohne Docker-Cache (bei hartnäckigen Fehlern)
 
 set -e  # Abbrechen bei Fehler
 
 ENV=${1:-dev}
+CLEAN=${2:-""}
 
 # ─── Umgebung auswählen ───────────────────────────────────────────────────────
 case "$ENV" in
@@ -18,7 +20,6 @@ case "$ENV" in
     ;;
   prod)
     COMPOSE_FILE="docker-compose.prod.yml"
-    # Domain aus .env lesen falls vorhanden
     if [ -f .env ]; then
       source .env
       BACKEND_URL="https://${DOMAIN:-localhost}"
@@ -31,36 +32,49 @@ case "$ENV" in
     ;;
   *)
     echo "Unbekannte Umgebung: '$ENV'"
-    echo "Verwendung: $0 [dev|prod]"
+    echo "Verwendung: $0 [dev|prod] [--clean]"
     exit 1
     ;;
 esac
 
 COMPOSE="docker compose -f $COMPOSE_FILE"
+BUILD_FLAGS=""
+if [ "$CLEAN" = "--clean" ]; then
+  BUILD_FLAGS="--no-cache"
+fi
 
-echo "╔══════════════════════════════════════════╗"
-echo "║   SF Guild Analytics — Restart ($ENV)   ║"
-echo "╚══════════════════════════════════════════╝"
+echo "╔═══════════════════════════════════════════════════════╗"
+if [ "$CLEAN" = "--clean" ]; then
+echo "║   SF Guild Analytics — Build ($ENV, clean)          ║"
+else
+echo "║   SF Guild Analytics — Build ($ENV)                 ║"
+fi
+echo "╚═══════════════════════════════════════════════════════╝"
 echo ""
 
-# ─── Dev: nur Backend neu bauen (Frontend läuft als Dev-Server mit Hot-Reload) ─
+# ─── Dev: nur Backend (Frontend läuft als Dev-Server mit Hot-Reload) ──────────
 if [ "$ENV" = "dev" ]; then
   echo "==> Stoppe Backend..."
   $COMPOSE stop backend
 
   echo "==> Baue Backend neu..."
-  $COMPOSE build backend
+  $COMPOSE build $BUILD_FLAGS backend
 
   echo "==> Starte Backend..."
   $COMPOSE up -d backend
 
-# ─── Prod: Frontend + Backend neu bauen ────────────────────────────────────────
+# ─── Prod: Frontend + Backend ─────────────────────────────────────────────────
 else
   echo "==> Stoppe Frontend und Backend..."
   $COMPOSE stop frontend backend
 
+  if [ "$CLEAN" = "--clean" ]; then
+    echo "==> Entferne alte Images..."
+    docker image rm sf-guild-analytics-frontend sf-guild-analytics-backend 2>/dev/null || true
+  fi
+
   echo "==> Baue Frontend und Backend neu..."
-  $COMPOSE build frontend backend
+  $COMPOSE build $BUILD_FLAGS frontend backend
 
   echo "==> Starte Frontend und Backend..."
   $COMPOSE up -d frontend backend
@@ -86,16 +100,14 @@ done
 
 # ─── Fertig ───────────────────────────────────────────────────────────────────
 echo ""
-echo "✓ Fertig!"
+echo "Fertig!"
 echo ""
 echo "  Frontend:  $FRONTEND_URL"
 echo "  Backend:   ${BACKEND_URL}/api"
 echo ""
-
 if [ "$ENV" = "prod" ]; then
   echo "  Logs:      docker compose -f $COMPOSE_FILE logs -f"
 else
   echo "  Logs:      docker compose logs -f backend"
 fi
-
 echo ""
