@@ -15,6 +15,8 @@ services:
     image: postgres:15-alpine
     container_name: sf_guild_db
     restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
     environment:
       POSTGRES_DB:       ${DB_NAME}
       POSTGRES_USER:     ${DB_USER}
@@ -33,8 +35,11 @@ services:
   # ── Backend ─────────────────────────────────────────────────────────────────
   backend:
     build: ./backend
+    image: sf-guild-analytics-backend
     container_name: sf_guild_backend
     restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
     environment:
       SPRING_DATASOURCE_URL:      jdbc:postgresql://db:5432/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
@@ -62,8 +67,11 @@ services:
       args:
         # Relativer Pfad — funktioniert auf jeder Domain ohne Änderung
         VITE_API_BASE_URL: /api
+    image: sf-guild-analytics-frontend
     container_name: sf_guild_frontend
     restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
     networks:
       - internal
     depends_on:
@@ -75,6 +83,8 @@ services:
     image: nginx:alpine
     container_name: sf_guild_nginx
     restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
     ports:
       - "80:80"    # HTTP (nur für Let's Encrypt Challenge + Redirect)
       - "443:443"  # HTTPS (echter Traffic)
