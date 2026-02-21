@@ -6,6 +6,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+echo "=== 0/4 Neuesten Code holen ==="
+git pull
+
 echo "=== 1/4 Backend JAR bauen ==="
 docker run --rm \
   --security-opt apparmor=unconfined \
