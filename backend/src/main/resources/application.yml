@@ -1,20 +1,61 @@
 server:
   port: 41414
+  ssl:
+    # HTTPS via Spring Boot SSL (dev: mkcert-Zertifikat, prod: Let's Encrypt via Reverse Proxy)
+    # Datei erzeugen: mkcert -pkcs12 localhost 127.0.0.1
+    # Dann Datei nach src/main/resources/ kopieren
+    enabled: ${SSL_ENABLED:false}
+    key-store: ${SSL_KEYSTORE_PATH:classpath:localhost+1.p12}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:changeit}
+    key-store-type: PKCS12
+
 spring:
   application:
     name: sf-guild-analytics
   datasource:
     url: jdbc:postgresql://localhost:5433/sf_guild_analytics
     username: postgres
+    # SECURITY: Use environment variable in production: ${DB_PASSWORD}
     password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    # SECURITY: show-sql logs all SQL queries including parameter values — disable in production
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  # SECURITY: Override this with a strong random secret via environment variable in production.
+  # Generate with: openssl rand -base64 64
+  # Never commit real secrets to version control.
+  jwtSecret: ${JWT_SECRET:DefaultSecretKeyForJwtOverTwentyFourCharactersLong_CHANGE_IN_PRODUCTION}
+  jwtExpirationMs: 86400000
+
 logging:
   level:
+    root: INFO
+    com.sf.guildanalytics: INFO
+    # SECURITY: Spring Security DEBUG logs authentication details including credentials context.
+    # Only enable temporarily for local debugging — NEVER in production.
+    org.springframework.security: WARN
+    # SECURITY: Hibernate SQL logging can expose query parameters — keep WARN in production.
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
+
+---
+# Development profile — activate with: --spring.profiles.active=dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.sf.guildanalytics: DEBUG
+    # Only enable Spring Security debug in dev profile, never in production
     org.springframework.security: DEBUG

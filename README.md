@@ -78,15 +78,41 @@ Alle Snapshots werden versioniert gespeichert und dienen als Basis für alle Ana
 
 ## Architektur
 
+### Entwicklung (lokal)
+
 ```
-Browser (Vue 3 Frontend)
-        ↓
-   REST API (:41414)
-        ↓
-Backend (Spring Boot)
-        ↓
- PostgreSQL (:5433)
+Browser (Vue 3, Port 5173)
+        │
+   Vite Dev Server
+        │  HTTP
+   REST API (Port 41414)
+        │
+  Spring Boot Backend
+        │
+   PostgreSQL (Port 5433)
 ```
+
+### Produktion (VPS)
+
+```
+Internet (Port 80 / 443)
+        │
+   nginx (SSL, Rate-Limiting, Security-Headers)
+        │
+   ┌────┴─────────────────┐
+   │                      │
+ /api/*               alles andere
+ /uploads/*               │
+   │                      │
+Spring Boot          Vue 3 (statische
+Backend              Dateien via nginx)
+   │
+PostgreSQL
+(nur intern erreichbar)
+```
+
+In der Produktion ist ausschließlich nginx öffentlich erreichbar.
+Backend und Datenbank kommunizieren nur über das interne Docker-Netzwerk.
 
 ---
 
@@ -94,11 +120,32 @@ Backend (Spring Boot)
 
 | Schicht | Technologie |
 |---------|-------------|
-| Frontend | Vue 3, Vite, TailwindCSS, Pinia, Vue Router |
-| Backend | Java 17, Spring Boot 3, Spring Security, JPA/Hibernate |
-| Authentifizierung | JWT (JJWT) |
+| Frontend | Vue 3, Vite, TailwindCSS, Pinia, Vue Router, Axios |
+| Backend | Java 17, Spring Boot 3.2, Spring Security, JPA/Hibernate |
+| Authentifizierung | JWT (JJWT 0.11), BCrypt (Stärke 12) |
+| Validierung | Bean Validation (jakarta.validation) |
 | Datenbank | PostgreSQL 15 |
+| Proxy / SSL | nginx, Let's Encrypt (Certbot) |
+| Logging | Logback (profil-basiert, kein Passwort-Logging) |
 | Deployment | Docker & Docker Compose |
+
+---
+
+## Sicherheit
+
+Die Anwendung implementiert folgende Sicherheitsmaßnahmen:
+
+| Maßnahme | Umsetzung |
+|----------|-----------|
+| Passwort-Hashing | BCrypt mit Stärke 12 |
+| Transport-Verschlüsselung | HTTPS via Let's Encrypt (Produktion) |
+| Authentifizierung | JWT, stateless, 24h Ablaufzeit |
+| Brute-Force-Schutz | nginx Rate-Limiting (5 Login-Versuche/min pro IP) |
+| Security-Headers | HSTS, X-Frame-Options, CSP, Referrer-Policy |
+| Input-Validierung | Bean Validation auf allen DTOs |
+| Kein Passwort-Logging | `toString()` maskiert, Logback konfiguriert |
+| Secrets | Umgebungsvariablen, nie im Code oder Repository |
+| Netzwerk-Isolation | DB und Backend ohne öffentliche Ports (Produktion) |
 
 ---
 
@@ -106,21 +153,82 @@ Backend (Spring Boot)
 
 ```
 sf-guild-analytics/
-├── backend/          # Spring Boot Anwendung
-├── frontend/         # Vue 3 + Vite Anwendung
-├── docker-compose.yml
-└── README.md
+├── backend/
+│   ├── src/main/java/com/sf/guildanalytics/
+│   │   ├── config/
+│   │   │   ├── DataInitializer.java      Standard-Admin beim ersten Start
+│   │   │   └── WebConfig.java            Upload-Konfiguration
+│   │   ├── controller/
+│   │   │   ├── AuthController.java       Login-Endpoint
+│   │   │   ├── GuildController.java
+│   │   │   ├── PlayerController.java
+│   │   │   ├── SnapshotController.java
+│   │   │   ├── UploadController.java
+│   │   │   └── UserController.java
+│   │   ├── dto/
+│   │   │   ├── LoginRequest.java         Validiert, toString() maskiert Passwort
+│   │   │   ├── JwtResponse.java
+│   │   │   └── UserDTO.java
+│   │   ├── entity/
+│   │   │   ├── User.java
+│   │   │   ├── Guild.java
+│   │   │   ├── Player.java
+│   │   │   └── PlayerSnapshot.java
+│   │   ├── security/
+│   │   │   ├── SecurityConfig.java       BCrypt, JWT-Filter, CORS, Security-Headers
+│   │   │   ├── JwtUtils.java             Token-Generierung & Validierung
+│   │   │   ├── JwtAuthenticationFilter.java
+│   │   │   └── UserDetailsServiceImpl.java
+│   │   └── service/
+│   │       ├── UserService.java          Passwort-Encoding beim Anlegen
+│   │       ├── GuildService.java
+│   │       ├── PlayerService.java
+│   │       └── SnapshotService.java
+│   ├── src/main/resources/
+│   │   ├── application.yml               Profil-basierte Konfiguration
+│   │   └── logback-spring.xml            Logging (kein Passwort in Logs)
+│   └── Dockerfile                        Multi-Stage Build
+│
+├── frontend/
+│   ├── src/
+│   │   ├── api/axios.js                  Axios mit JWT-Interceptor
+│   │   ├── stores/auth.js                Pinia Auth-Store
+│   │   ├── router/index.js               Routen mit Auth-Guards
+│   │   └── views/
+│   │       ├── LoginView.vue
+│   │       └── ...
+│   ├── Dockerfile                        Multi-Stage: Build + nginx
+│   └── nginx-frontend.conf               SPA-Routing für Vue Router
+│
+├── nginx/
+│   └── nginx.conf                        Reverse Proxy, SSL, Rate-Limiting
+│
+├── docker-compose.yml                    Entwicklungsumgebung (lokal)
+├── docker-compose.prod.yml               Produktionsumgebung (VPS)
+├── .env.example                          Vorlage für Umgebungsvariablen
+├── .env                                  Secrets (in .gitignore, nie committen)
+├── .gitignore                            Schützt .env und Zertifikate
+├── README.md                             Diese Datei
+└── DEPLOYMENT.md                         VPS-Deployment-Anleitung
 ```
 
 ---
 
-## Installation & Start
+## Deployment (Produktionsserver)
+
+Vollständige Schritt-für-Schritt-Anleitung zum Hosten auf einem VPS mit HTTPS, Firewall und Docker:
+
+**[DEPLOYMENT.md](DEPLOYMENT.md)**
+
+---
+
+## Installation & Start (Lokal / Entwicklung)
 
 ### Voraussetzungen
 
-- [Docker & Docker Compose](https://docs.docker.com/get-docker/) (für alle Varianten)
-- [Java 17](https://adoptium.net/) + [Maven](https://maven.apache.org/) (nur für lokale Backend-Entwicklung)
-- [Node.js 18+](https://nodejs.org/) + npm (nur für lokale Frontend-Entwicklung)
+- [Docker & Docker Compose](https://docs.docker.com/get-docker/)
+- [Java 17](https://adoptium.net/) + [Maven](https://maven.apache.org/) (nur für Backend-Entwicklung ohne Docker)
+- [Node.js 20+](https://nodejs.org/) + npm (nur für Frontend-Entwicklung ohne Docker)
 
 ---
 
@@ -140,6 +248,12 @@ Danach sind die Dienste unter folgenden Adressen erreichbar:
 | Backend API | http://localhost:41414 |
 | PostgreSQL | localhost:5433 |
 
+Standard-Login beim ersten Start:
+- Benutzername: `admin`
+- Passwort: `admin123`
+
+> Das Standard-Passwort nach dem ersten Login sofort über die Benutzerverwaltung ändern.
+
 Logs aller Dienste ansehen:
 ```bash
 docker compose logs -f
@@ -152,9 +266,9 @@ docker compose down
 
 ---
 
-### Option B – Lokale Entwicklung
+### Option B – Lokale Entwicklung (ohne Docker für Backend/Frontend)
 
-Diese Variante eignet sich, wenn du am Backend oder Frontend entwickeln möchtest.
+Diese Variante eignet sich, wenn du aktiv am Code entwickelst und Hot-Reload brauchst.
 
 **1. Datenbank starten (Docker)**
 
@@ -168,13 +282,11 @@ Die PostgreSQL-Instanz ist danach unter `localhost:5433` erreichbar.
 
 ```bash
 cd backend
-mvn spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Das Backend startet unter: `http://localhost:41414`
-
-> **Hinweis:** Beim ersten Start legt Hibernate die Tabellen automatisch an (`ddl-auto: update`).
-> Ein Admin-User muss manuell in die `users`-Tabelle eingetragen werden (BCrypt-Hash für das Passwort).
+Das Backend startet unter `http://localhost:41414`.
+Beim ersten Start legt Hibernate alle Tabellen an und der Standard-Admin-User wird automatisch erstellt.
 
 **3. Frontend starten**
 
@@ -184,7 +296,7 @@ npm install
 npm run dev
 ```
 
-Das Frontend startet unter: `http://localhost:5173`
+Das Frontend startet unter `http://localhost:5173`.
 
 ---
 
@@ -199,15 +311,38 @@ docker compose up -d db
 
 ## API-Endpunkte (Auszug)
 
-| Methode | Endpunkt | Beschreibung |
-|---------|----------|--------------|
-| POST | `/api/auth/login` | Login, gibt JWT zurück |
+| Methode | Endpunkt | Auth | Beschreibung |
+|---------|----------|------|--------------|
+| POST | `/api/auth/login` | Nein | Login, gibt JWT zurück |
+| GET | `/api/guilds` | Nein | Alle Gilden abrufen |
+| GET | `/api/players` | Nein | Alle Spieler abrufen |
+| GET | `/api/snapshots` | Nein | Snapshots abrufen |
+| GET | `/api/users` | JWT | Benutzerliste (Admin) |
+| POST | `/api/users` | JWT | Benutzer anlegen (Admin) |
 
 Beispiel-Login:
 ```bash
 curl -X POST http://localhost:41414/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "yourpassword"}'
+  -d '{"username": "admin", "password": "admin123"}'
+```
+
+Antwort:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "user": {
+    "id": "...",
+    "username": "admin",
+    "role": "ADMIN"
+  }
+}
+```
+
+Authentifizierter Request:
+```bash
+curl http://localhost:41414/api/users \
+  -H "Authorization: Bearer <token>"
 ```
 
 ---
@@ -223,11 +358,14 @@ curl -X POST http://localhost:41414/api/auth/login \
 
 ## Roadmap (Auszug)
 
-- [ ] Basis-Dashboard
+- [x] Basis-Authentifizierung (JWT, BCrypt, Rollen)
+- [x] Gilden & Spieler verwalten
+- [x] Snapshots erfassen
+- [x] Datei-Upload
+- [x] Produktions-Deployment (Docker, nginx, HTTPS)
 - [ ] Spieler-Zeitverlauf-Charts
 - [ ] Prozent- & Trend-Berechnung
 - [ ] CSV-Import
-- [ ] Rollen & Rechte
 - [ ] Export (PNG / CSV)
 - [ ] Discord-Integration (optional)
 

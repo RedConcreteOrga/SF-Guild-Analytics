@@ -1,0 +1,109 @@
+version: '3.8'
+
+# PRODUCTION Docker Compose
+# Verwendung: docker compose -f docker-compose.prod.yml up -d
+#
+# Vor dem Start:
+# 1. cp .env.example .env  und alle Werte setzen
+# 2. YOUR_DOMAIN in nginx/nginx.conf ersetzen
+# 3. SSL-Zertifikat einmalig ausstellen (siehe README)
+
+services:
+
+  # ── Datenbank ───────────────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: sf_guild_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    # SECURITY: Kein "ports:" → Datenbank ist NICHT vom Internet erreichbar
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend ─────────────────────────────────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: sf_guild_backend
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://db:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET:                 ${JWT_SECRET}
+      SPRING_PROFILES_ACTIVE:     prod
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - internal
+    depends_on:
+      db:
+        condition: service_healthy
+    # SECURITY: Kein "ports:" → Backend ist NICHT direkt vom Internet erreichbar
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:41414/api/guilds || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend ─────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Relativer Pfad — funktioniert auf jeder Domain ohne Änderung
+        VITE_API_BASE_URL: /api
+    container_name: sf_guild_frontend
+    restart: unless-stopped
+    networks:
+      - internal
+    depends_on:
+      - backend
+    # SECURITY: Kein "ports:" → Frontend ist NICHT direkt vom Internet erreichbar
+
+  # ── nginx Reverse Proxy (einziger öffentlicher Einstiegspunkt) ───────────────
+  nginx:
+    image: nginx:alpine
+    container_name: sf_guild_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"    # HTTP (nur für Let's Encrypt Challenge + Redirect)
+      - "443:443"  # HTTPS (echter Traffic)
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    networks:
+      - internal
+    depends_on:
+      - frontend
+      - backend
+
+  # ── Certbot (SSL-Zertifikat — einmalig und zur Erneuerung) ──────────────────
+  certbot:
+    image: certbot/certbot
+    container_name: sf_guild_certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    # Wird manuell ausgeführt, kein restart
+    profiles:
+      - certbot
+
+networks:
+  internal:
+    driver: bridge
+    # SECURITY: Alle Container kommunizieren nur intern
+
+volumes:
+  postgres_data:
+  uploads_data:
