@@ -41,13 +41,19 @@
     <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div class="px-6 py-4 bg-slate-800/50 border-b border-slate-800 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-white">Update Player Stats</h3>
+          <h3 class="text-lg font-bold text-white">
+            {{ editingSnapshotId ? 'Snapshot bearbeiten' : 'Neuen Snapshot erstellen' }}
+          </h3>
           <button @click="showEditModal = false" class="text-slate-400 hover:text-white transition-colors">
             <X class="w-5 h-5" />
           </button>
         </div>
-        
+
         <form @submit.prevent="handleUpdateStats" class="p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Datum & Uhrzeit</label>
+            <input v-model="editForm.timestamp" type="datetime-local" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:border-indigo-500 focus:outline-none transition-all" />
+          </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="col-span-1">
               <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Level</label>
@@ -220,6 +226,7 @@
                   <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Date</th>
                   <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Level</th>
                   <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Attributes</th>
+                  <th v-if="authStore.isAuthenticated" class="px-4 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center"></th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-800">
@@ -250,6 +257,24 @@
                       </div>
                     </div>
                   </td>
+                  <td v-if="authStore.isAuthenticated" class="px-4 py-4 text-center">
+                    <div class="flex items-center justify-center gap-1">
+                      <button
+                        @click="openEditSnapshotModal(snapshot)"
+                        class="text-slate-500 hover:text-indigo-400 transition-colors p-1 rounded"
+                        title="Snapshot bearbeiten"
+                      >
+                        <Edit2 class="w-4 h-4" />
+                      </button>
+                      <button
+                        @click="handleDeleteSnapshot(snapshot.id)"
+                        class="text-slate-500 hover:text-red-400 transition-colors p-1 rounded"
+                        title="Snapshot löschen"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -270,7 +295,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
-import { Loader2, ArrowLeft, User, History, Database, Edit2, X, UserPlus } from 'lucide-vue-next'
+import { Loader2, ArrowLeft, User, History, Database, Edit2, X, UserPlus, Trash2 } from 'lucide-vue-next'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -300,7 +325,9 @@ const handleLinkPlayer = async () => {
 }
 
 const showEditModal = ref(false)
+const editingSnapshotId = ref(null)
 const editForm = reactive({
+  timestamp: '',
   level: 0,
   strength: 0,
   dexterity: 0,
@@ -311,6 +338,12 @@ const editForm = reactive({
   dungeonProgress: 0,
   fortressLevel: 0
 })
+
+const toDatetimeLocal = (isoOrDate) => {
+  const d = isoOrDate ? new Date(isoOrDate) : new Date()
+  const offset = d.getTimezoneOffset() * 60000
+  return new Date(d - offset).toISOString().slice(0, 16)
+}
 
 const fetchPlayerData = async () => {
   try {
@@ -328,7 +361,9 @@ const fetchPlayerData = async () => {
 }
 
 const openEditModal = () => {
+  editingSnapshotId.value = null
   const latest = snapshots.value[0] || {}
+  editForm.timestamp = toDatetimeLocal()
   editForm.level = player.value.level || latest.level || 1
   editForm.strength = latest.strength || 0
   editForm.dexterity = latest.dexterity || 0
@@ -341,22 +376,52 @@ const openEditModal = () => {
   showEditModal.value = true
 }
 
+const openEditSnapshotModal = (snapshot) => {
+  editingSnapshotId.value = snapshot.id
+  editForm.timestamp = toDatetimeLocal(snapshot.timestamp)
+  editForm.level = snapshot.level
+  editForm.strength = snapshot.strength
+  editForm.dexterity = snapshot.dexterity
+  editForm.intelligence = snapshot.intelligence
+  editForm.constitution = snapshot.constitution
+  editForm.honor = snapshot.honor
+  editForm.hp = snapshot.hp
+  editForm.dungeonProgress = snapshot.dungeonProgress
+  editForm.fortressLevel = snapshot.fortressLevel
+  showEditModal.value = true
+}
+
 const handleUpdateStats = async () => {
   saving.value = true
   try {
     const payload = {
       ...editForm,
       playerId: player.value.id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date(editForm.timestamp).toISOString()
     }
-    await api.post('/snapshots', payload)
-    await fetchPlayerData() // Refresh data
+    if (editingSnapshotId.value) {
+      await api.put(`/snapshots/${editingSnapshotId.value}`, payload)
+    } else {
+      await api.post('/snapshots', payload)
+    }
+    await fetchPlayerData()
     showEditModal.value = false
   } catch (error) {
-    console.error('Error updating stats:', error)
-    alert('Failed to update stats. Please check console for details.')
+    console.error('Error saving snapshot:', error)
+    alert('Fehler beim Speichern. Bitte Konsole prüfen.')
   } finally {
     saving.value = false
+  }
+}
+
+const handleDeleteSnapshot = async (snapshotId) => {
+  if (!confirm('Diesen Snapshot wirklich löschen?')) return
+  try {
+    await api.delete(`/snapshots/${snapshotId}`)
+    await fetchPlayerData()
+  } catch (error) {
+    console.error('Error deleting snapshot:', error)
+    alert('Fehler beim Löschen. Bitte Konsole prüfen.')
   }
 }
 
