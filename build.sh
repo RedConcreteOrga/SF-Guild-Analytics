@@ -52,16 +52,16 @@ fi
 echo "╚═══════════════════════════════════════════════════════╝"
 echo ""
 
-# ─── Dev: nur Backend (Frontend läuft als Dev-Server mit Hot-Reload) ──────────
+# ─── Dev: Backend + Frontend ──────────────────────────────────────────────────
 if [ "$ENV" = "dev" ]; then
-  echo "==> Stoppe Backend..."
-  $COMPOSE stop backend
+  echo "==> Stoppe Frontend und Backend..."
+  $COMPOSE stop frontend backend
 
-  echo "==> Baue Backend neu..."
-  $COMPOSE build $BUILD_FLAGS backend
+  echo "==> Baue Frontend und Backend neu..."
+  $COMPOSE build $BUILD_FLAGS frontend backend
 
-  echo "==> Starte Backend..."
-  $COMPOSE up -d backend
+  echo "==> Starte Frontend und Backend..."
+  $COMPOSE up -d frontend backend
 
 # ─── Prod: Frontend + Backend ─────────────────────────────────────────────────
 else
@@ -108,6 +108,6 @@ echo ""
 if [ "$ENV" = "prod" ]; then
   echo "  Logs:      docker compose -f $COMPOSE_FILE logs -f"
 else
-  echo "  Logs:      docker compose logs -f backend"
+  echo "  Logs:      docker compose logs -f"
 fi
 echo ""

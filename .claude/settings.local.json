@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(chmod:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(cd:*)"
     ]
   }
 }

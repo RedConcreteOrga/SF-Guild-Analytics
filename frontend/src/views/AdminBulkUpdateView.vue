@@ -6,7 +6,15 @@
         <h2 class="text-3xl font-bold text-white tracking-tight">Bulk Stats Update</h2>
         <p class="text-slate-400 mt-1">Stats für alle Spieler deiner Gilden auf einmal eintragen und speichern.</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex flex-col gap-0.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Snapshot-Datum</label>
+          <input
+            v-model="snapshotDate"
+            type="datetime-local"
+            class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-indigo-500 focus:outline-none transition-all"
+          />
+        </div>
         <span v-if="totalSaved > 0" class="text-green-400 text-sm font-semibold flex items-center gap-1.5">
           <CheckCircle class="w-4 h-4" />
           {{ totalSaved }} gespeichert
@@ -161,6 +169,13 @@ const forms = reactive({})
 const dirty = reactive({})
 const saved = reactive({})
 
+const toDatetimeLocal = () => {
+  const d = new Date()
+  const offset = d.getTimezoneOffset() * 60000
+  return new Date(d - offset).toISOString().slice(0, 16)
+}
+const snapshotDate = ref(toDatetimeLocal())
+
 const dirtyCount = computed(() => Object.values(dirty).filter(Boolean).length)
 
 const markDirty = (playerId) => {
@@ -170,7 +185,7 @@ const markDirty = (playerId) => {
 
 const buildPayload = (playerId) => ({
   playerId,
-  timestamp: new Date().toISOString(),
+  timestamp: new Date(snapshotDate.value).toISOString(),
   level:           forms[playerId].level           || 0,
   strength:        forms[playerId].strength        || 0,
   dexterity:       forms[playerId].dexterity       || 0,

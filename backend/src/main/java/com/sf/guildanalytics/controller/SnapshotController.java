@@ -2,6 +2,7 @@ package com.sf.guildanalytics.controller;
 
 import com.sf.guildanalytics.dto.SnapshotDTO;
 import com.sf.guildanalytics.service.SnapshotService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,17 @@ public class SnapshotController {
     @PostMapping
     public SnapshotDTO createSnapshot(@RequestBody SnapshotDTO snapshotDTO) {
         return snapshotService.createSnapshot(snapshotDTO);
+    }
+
+    @PutMapping("/{id}")
+    public SnapshotDTO updateSnapshot(@PathVariable UUID id, @RequestBody SnapshotDTO snapshotDTO) {
+        return snapshotService.updateSnapshot(id, snapshotDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSnapshot(@PathVariable UUID id) {
+        snapshotService.deleteSnapshot(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/player/{playerId}/analytics/level-history")
