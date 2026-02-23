@@ -91,6 +91,7 @@
           <a href="#" class="hover:text-slate-300">Docs</a>
           <router-link v-if="!authStore.isAuthenticated" :to="{ name: 'login' }" class="text-indigo-400 hover:text-indigo-300 font-bold">Sign In</router-link>
           <a href="#" class="hover:text-slate-300">Support</a>
+          <router-link :to="{ name: 'impressum' }" class="hover:text-slate-300">Impressum</router-link>
         </div>
       </div>
     </footer>
