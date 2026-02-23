@@ -54,6 +54,12 @@ const router = createRouter({
                     name: 'player-detail',
                     component: () => import('@/views/PlayerDetailView.vue'),
                 },
+                {
+                    path: 'impressum',
+                    name: 'impressum',
+                    component: () => import('@/views/ImpressumView.vue'),
+                    meta: { requiresAuth: false },
+                },
             ],
         },
     ],
